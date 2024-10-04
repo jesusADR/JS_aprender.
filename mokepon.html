@@ -6,47 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mokepon</title>
     <script src="./js/mokepon.js"></script>
+    <link rel="icon" href="./icon/poke_ball_icon_155925.webp" type="image/x-icon">
 </head>
 
 <body>
     <h1>Mokepon</h1>
 
-    <section id="Seleccionar-Mascotas"> 
+    <section id="Seleccionar-Mascotas">
         <h2>Elige tu mascota:</h2>
 
-       
-        <input type="radio" name = "mascota" id="Hipodoge"/>
+
+        <input type="radio" name="mascota" id="Hipodoge" />
         <label for="Hipodoge">Hipodoge</label>
 
-        <input type="radio" name = "mascota" id="Capipepo"/>
+        <input type="radio" name="mascota" id="Capipepo" />
         <label for="Capipepo">Capipepo</label>
 
-        <input type="radio" name = "mascota" id="Ratigueya"/>
+        <input type="radio" name="mascota" id="Ratigueya" />
         <label for="Ratigueya">Ratigueya</label>
-       <br>
-       
-        Langostelvis -> Agua y Fuego
-        Tucapalma -> Agua y Tierra
-        Pydos -> Tierra y Fuego
+        <br>
+        <span> Langostelvis -> Agua y Fuego <br>
+            Tucapalma -> Agua y Tierra <br>
+            Pydos -> Tierra y Fuego <br>
+        </span>
+        <br>
 
-        
         <button id="button-mascota">seleccionar</button>
     </section>
-  
-    <section id=" seleccionar-ataque"> 
-         <h2>Elige tu ataque:</h2>
+
+    <section id=" seleccionar-ataque">
+        <h2>Elige tu ataque:</h2>
     </section>
 
-    <p>Tu mascota tiene <span>3</span></p>
-    <p>Las mascotas del enemigo tiene <span>3</span></p>
+    <p>Tu mascota <span id="mascota-jugador"></span> tiene <span>3</span></p>
+    <p>Las mascota <span id="mascota-enemigo"></span> del enemigo tiene <span>3</span></p>
     <p>
-        <button id="button-fuego">Fuego</button>
-        <button id="button-agua">Agua</button>
-        <button id="button-tierra">Tierra</button>
+        <button id="button-fuego">Fuego 🔥</button>
+        <button id="button-agua">Agua 💧</button>
+        <button id="button-tierra">Tierra 🌿</button>
     </p>
 
     <section id="mensajes"></section>
-    <p> tu mascota atacon con FUEGO, las mascota del enemigo ataco con TIERRA - GANASTE </p>
+    <p> tu mascota ataco con FUEGO, las mascota del enemigo ataco con TIERRA - GANASTE </p>
 
     <section id="reiniciar">
         <button id="button-reiniciar">Reiniciar</button>

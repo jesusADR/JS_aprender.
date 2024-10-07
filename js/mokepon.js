@@ -1,33 +1,20 @@
 
 let ataqueJugador
+let ataqueEnemigo
 
 function iniciarJuego() {
     let botonMascotaJugador = document.getElementById('button-mascota')
     botonMascotaJugador.addEventListener('click', seleccionarMascotaJugador)
 
     let botonFuego = document.getElementById('button-fuego')
-    botonFuego.addEventListener('clip', ataqueFuego)
+    botonFuego.addEventListener('click', ataqueFuego)
+
     let botonAgua = document.getElementById('button-agua')
-    botonAgua.addEventListener('clip', ataqueAgua)
+    botonAgua.addEventListener('click', ataqueAgua)
+
     let botonTierra = document.getElementById('button-tierra')
-    botonTierra.addEventListener('clip', ataqueTierra)
+    botonTierra.addEventListener('click', ataqueTierra)
 }
-
-function ataqueFuego() {
-    ataqueJugador = 'fuego'
-    alert(ataqueJugador)
-}
-
-function ataqueAgua() {
-    ataqueJugador = 'Agua'
-    alert(ataqueJugador)
-}
-
-function ataqueTierra() {
-    ataqueJugador = 'Tierra'
-    alert(ataqueJugador)
-}
-
 
 function seleccionarMascotaJugador() {
 
@@ -68,10 +55,39 @@ function seleccionarMascotaEnemigo() {
     }
 }
 
+function ataqueFuego() {
+    ataqueJugador = 'Fuego 🔥'
+    ataqueAleatorioEnemigo()
+}
+
+function ataqueAgua() {
+    ataqueJugador = 'Agua 💧'
+    ataqueAleatorioEnemigo()
+}
+
+function ataqueTierra() {
+    ataqueJugador = 'Tierra 🌿'
+    ataqueAleatorioEnemigo()
+}
+
+function ataqueAleatorioEnemigo() {
+    let ataqueAleatorio = aleatorio(1, 3)
+    let spanAtaqueEnemigo = document.getElementById('ataque-enemigo')
+
+    if (ataqueAleatorio == 1) {
+        ataqueEnemigo = 'Fuego'
+
+    } else if (ataqueAleatorio == 2) {
+        ataqueEnemigo = 'Agua'
+
+    } else if (ataqueAleatorio == 3) {
+        ataqueEnemigo = 'Tierra'
+    }
+}
+
 function aleatorio(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 window.addEventListener('load', iniciarJuego)
-
 

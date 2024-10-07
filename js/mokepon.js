@@ -83,6 +83,13 @@ function ataqueAleatorioEnemigo() {
     } else if (ataqueAleatorio == 3) {
         ataqueEnemigo = 'Tierra'
     }
+
+    crearMensaje()
+}
+
+function crearMensaje() {
+    let parrafo = document.createElement('p')
+    parrafo.innerHTML = 'tu mascota ataco con' + ataqueJugador + ', las mascota del enemigo ataco con' + spanAtaqueEnemigo - GANASTE' +  ' - PENDIENTE'
 }
 
 function aleatorio(min, max) {

@@ -1,0 +1,13 @@
+.titulo{
+    color: hwb(43 62% 15%);
+    height: 50px;
+    width: 200px;
+    background-color: rgb(171, 84, 253);
+}
+
+#Seleccionar-Mascotas{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

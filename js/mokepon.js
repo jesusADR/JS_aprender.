@@ -68,7 +68,6 @@ function seleccionarMascotaEnemigo() {
         spanMascotaEnemigo.innerHTML = 'Capipepo'
     } else {
         spanMascotaEnemigo.innerHTML = 'Ratigueya'
-
     }
 }
 

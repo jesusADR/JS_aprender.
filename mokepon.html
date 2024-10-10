@@ -7,6 +7,7 @@
     <title>Mokepon</title>
     <script src="./js/mokepon.js"></script>
     <link rel="icon" href="./icon/poke_ball_icon_155925.webp" type="image/x-icon">
+    <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
@@ -23,31 +24,28 @@
         <label for="Capipepo">Capipepo</label>
 
         <input type="radio" name="mascota" id="Ratigueya" />
-        <label for="Ratigueya">Ratigueya</label>
+        <label for="Ratigueya">Ratigueya</label>  
         <br>
-        <span> Langostelvis -> Agua y Fuego <br>
-            Tucapalma -> Agua y Tierra <br>
-            Pydos -> Tierra y Fuego <br>
-        </span>
         <br>
 
         <button id="button-mascota">seleccionar</button>
     </section>
 
-    <section id=" seleccionar-ataque">
+    <section id="seleccionar-ataque">
         <h2>Elige tu ataque:</h2>
+
+
+        <p>Tu mascota <span id="mascota-jugador"></span> tiene <span id="vidas-jugador">3</span></p>
+        <p>Las mascota <span id="mascota-enemigo"></span> del enemigo tiene <span id="vidas-enemigo">3</span></p>
+        <p>
+            <button id="button-fuego">Fuego 🔥</button>
+            <button id="button-agua">Agua 💧</button>
+            <button id="button-tierra">Tierra 🌿</button>
+        </p>
     </section>
-
-    <p>Tu mascota <span id="mascota-jugador"></span> tiene <span id="vidas-jugador">3</span></p>
-    <p>Las mascota <span id="mascota-enemigo"></span> del enemigo tiene <span id="vidas-enemigo">3</span></p>
-    <p>
-        <button id="button-fuego">Fuego 🔥</button>
-        <button id="button-agua">Agua 💧</button>
-        <button id="button-tierra">Tierra 🌿</button>
-    </p>
-
     <section id="mensajes"></section>
-        <button id="button-reiniciar">Reiniciar</button>
+    <br>
+    <button id="button-reiniciar">Reiniciar</button>
     </section>
 </body>
 

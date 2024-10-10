@@ -5,6 +5,13 @@ let vidasJugador = 3
 let vidasEnemigo = 3
 
 function iniciarJuego() {
+
+    let sectionSeleccionarAtaque = document.getElementById('seleccionar-ataque')
+    sectionSeleccionarAtaque.style.display = 'none'
+
+    let sectionreiniciar = document.getElementById('button-reiniciar')
+    sectionreiniciar.style.display = 'none'
+
     let botonMascotaJugador = document.getElementById('button-mascota')
     botonMascotaJugador.addEventListener('click', seleccionarMascotaJugador)
 
@@ -22,6 +29,11 @@ function iniciarJuego() {
 }
 
 function seleccionarMascotaJugador() {
+
+    let sectionSeleccionarMascota = document.getElementById('Seleccionar-Mascotas')
+    sectionSeleccionarMascota.style.display = 'none'
+    let sectionSeleccionarAtaque = document.getElementById('seleccionar-ataque')
+    sectionSeleccionarAtaque.style.display = 'block'
 
     let inputHipodoge = document.getElementById('Hipodoge')
     let inputCapipepo = document.getElementById('Capipepo')
@@ -130,7 +142,7 @@ function revisarVidas() {
     }
 
     else if (vidasJugador == 0) {
-        crearMensajeFinal('lo siento, perdiste 😢😢')
+        crearMensajeFinal('LO SIENTO!!!, perdiste 😢😢')
     }
 }
 
@@ -143,6 +155,7 @@ function crearMensaje(resultado) {
 }
 
 function crearMensajeFinal(resultadoFinal) {
+
     let sectionMensajes = document.getElementById('mensajes')
     let parrafo = document.createElement('p')
     parrafo.innerHTML = resultadoFinal
@@ -150,13 +163,16 @@ function crearMensajeFinal(resultadoFinal) {
     sectionMensajes.appendChild(parrafo)
 
     let botonFuego = document.getElementById('button-fuego')
-    botonFuego.Disabled = true
+    botonFuego.disabled = true
 
     let botonAgua = document.getElementById('button-agua')
-    botonFuego.Disabled = true
+    botonAgua.disabled = true
 
     let botonTierra = document.getElementById('button-tierra')
-    botonFuego.Disabled = true
+    botonTierra.disabled = true
+
+    let sectionreiniciar = document.getElementById('button-reiniciar')
+    sectionreiniciar.style.display = 'block'
 }
 
 function reiniciarJuego() {

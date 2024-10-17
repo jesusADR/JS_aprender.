@@ -121,12 +121,13 @@ var usuario = function (ruta) {
               '</div>';
             document.querySelector('#modalPerfil #usuarioContenido').insertAdjacentHTML('afterend', html);
           }
+
         }
       })
       .fail(function (xhr) {
         console.warn(xhr);
       })
-  }
+  };
 
   this.perfiles = function () {
 
@@ -157,8 +158,9 @@ var usuario = function (ruta) {
         // $('#selectPerfilVer').siblings('.custom-combobox').children('input').data('ui-autocomplete').options.position = {my: "left bottom", at: "left top"};
       },
     });
-  }
-  this.actualizaPerfil = function () {
+  };
+
+  this.actualizaPerfil = function (two_step_update_pass = false) {
 
     var telefonoA = $("#profileTelfA").intlTelInput('getNumber');
     var telefonoB = $("#profileTelfB").intlTelInput('getNumber');
@@ -178,6 +180,10 @@ var usuario = function (ruta) {
       return false;
     }
 
+    if (valida.validForm(camposPerfil)) {
+      alertas.warning('Highlighted fields are required');
+      return false;
+    }
 
     var data = new FormData();
     data.append('token', sistema.token);
@@ -189,7 +195,6 @@ var usuario = function (ruta) {
     data.append('telefonoA', telefonoA);
     data.append('telefonoB', telefonoB);
     data.append('telefonoC', telefonoC);
-    let twoStep = false;
 
     if ($('#profileNewPass').val() != "" || $('#profileNewPass2').val() != "") {
       if (valida.validForm(camposPass)) {
@@ -205,6 +210,7 @@ var usuario = function (ruta) {
         return false;
       }
 
+
       if (!usuario.validarPassword('profileNewPass')) {
         alertas.warning('Password conditions not valid');
         $('#profileNewPass').val('');
@@ -216,23 +222,20 @@ var usuario = function (ruta) {
       data.append('actualizaPass', 'true');
       data.append('passNuevo', $('#profileNewPass').val());
 
-      var sendCode = this.sendCodePanel(data.get('correo'), data.get('telefonoC'));
-      console.log(sendCode);
-      //agregar logica de envio de codigo de verificacion.
-      //validar el codigo de verificacion.
-      //si el codigo es correct, enviar la data y cambia la contraseña.
-      //si el codigo es incorrecto, no enviar y mostrar el mensaje del error.
-
+      if (two_step_update_pass) {
+        this.actualizaPerfilrequest(data);
+      } else {
+        var sendCode = this.sendCodePanel(data.get('correo'), data.get('telefonoC'));
+        console.log(sendCode);
+      }
     } else {
       data.append('actualizaPass', 'false');
       valida.limpiar(camposPass);
+      this.actualizaPerfilrequest(data);
     }
+  };
 
-
-    // sistema.check_session();
-    console.log(data);
-
-
+  this.actualizaPerfilrequest = function (data) {
     $.ajax({
       url: ruta + 'update_profile',
       type: 'post',
@@ -241,12 +244,8 @@ var usuario = function (ruta) {
       processData: false,
       data: data,
 
-
       success: function (call) {
-
         call = call.data;
-
-        console.log(call);
         switch (call) {
           case "1":
             alertas.mensaje('You are using a Password that you used before , please use a Different Password');
@@ -300,9 +299,7 @@ var usuario = function (ruta) {
             alertas.mensaje("Changes Applied");
             usuario.infoPerfil();
             usuario.limpiarModal();
-            $('.confirm').on('click', function () {
-              window.location.href = '/';
-            });
+            break;
         }
         usuario.infoPerfil();
       },
@@ -312,7 +309,7 @@ var usuario = function (ruta) {
         usuario.limpiarModal();
       }
     });
-  }
+  };
 
   this.cambiaPerfil = function () {
     // sistema.check_session();
@@ -358,6 +355,7 @@ var usuario = function (ruta) {
       alertas.error('You must select an option');
     }
   };
+
   this.pestana = function (opcion) {
     switch (opcion) {
       case 0:
@@ -402,23 +400,29 @@ var usuario = function (ruta) {
         $('#pestana4').removeClass('pestanaActivaTwoStep');
     }
   };
+
   this.limpiarModal = function () {
     usuario.limpiarPass();
     usuario.limpiarSecondPass();
     valida.limpiar(camposPass);
     valida.limpiar(camposPerfil);
+    $('#profileNewPass').removeClass('field-invalid');
+    $('#profileNewPass2').removeClass('field-invalid');
   };
+
   this.limpiarPass = function () {
     $('#profileNewPass').val('');
     $('#profileNewPass2').val('');
     $('#profileOldPass').val('');
-  }
+  };
+
   this.limpiarSecondPass = function () {
     $('#profileLastPassSecond').val('');
     $('#profileOldPass').val('');
     $('#profileNewPassSecond').val('');
     $('#profileNewPass2Second').val('');
-  }
+  };
+
   this.cierraModal = function () {
     $('#modalPerfil').css('display', 'none');
     $('body').css('overflow', 'auto');
@@ -433,13 +437,14 @@ var usuario = function (ruta) {
     $('#api_token').css('display', 'none');
     $('#security').css('display', 'none');
     $('#usuarioContenido').css('display', 'block');
-    $('updateserprofile').prop('disable', true);
+    $('#updateUserprofile').prop('disabled', true);
 
-    two_step.closeCode(ruta, sistema.token, camposPass);
-  }
+    // two_step.closeCode(ruta, sistema.token, camposPass);
+  };
 
   this.formatTelf = function () {
-  }
+  };
+
   this.inicio = function () {
     usuario.infoPerfil();
     usuario.perfiles();
@@ -448,6 +453,7 @@ var usuario = function (ruta) {
     });
     usuario.formatTelf();
   };
+
   this.actualizaPassNuevo = function () {
     if (valida.validForm(camposPassNuevo)) {
       alertas.warning('Highlighted fields are required');
@@ -469,7 +475,6 @@ var usuario = function (ruta) {
     }
     passAnterior = $('#passAnteriorUN').val();
     passNuevo = $('#passNuevo2UN').val();
-    
     // sistema.check_session();
     $.ajax({
       url: ruta + 'update_pass_new',
@@ -517,6 +522,7 @@ var usuario = function (ruta) {
       }
     });
   };
+
   this.guardarPassword = function () { // Ruta no existente en el Handler de USUARIO
     var validar = valida.validForm(["recoveryPass1", "recoveryPass2"]);
     var password1 = $('#recoveryPass1').val();
@@ -583,6 +589,8 @@ var usuario = function (ruta) {
   };
 
   this.sendCodePanel = function (correo, telefono) {
+    two_step.enableAllBoxes();
+    two_step.showTime();
     if (!correo || !telefono) {
       alert('Correo o teléfono vacío. Por favor, revisa la información.');
       return;
@@ -626,17 +634,13 @@ var usuario = function (ruta) {
     });
     return true;
   };
-
-
 };
-
-// contador-profile
-
 var TwoStepValidate = function () {
   this.time = null;
   this.segundosInterval = null;
   this.token = "";
   this.attempts = 0;
+  this.maxAttempts = 5;
 }
 
 TwoStepValidate.prototype.validatedCodeTwoStep = function (token, route) {
@@ -666,8 +670,7 @@ TwoStepValidate.prototype.validatedCodeTwoStep = function (token, route) {
     var codeSix = document.getElementById('code6TwoStep');
 
     numberBox.addEventListener('input', function () {
-
-      this.value = this.value.replace(/[^0-9]/, '');
+      this.value = this.value.replace(/[^0-9]/g, '');
       if (this.value) {
         switch (this.id) {
           case 'code1TwoStep':
@@ -688,7 +691,7 @@ TwoStepValidate.prototype.validatedCodeTwoStep = function (token, route) {
         }
       }
       if (codeOne.value && codeTwo.value && codeThree.value && codeFour.value && codeFive.value && codeSix.value) {
-        two_step.checkTwoStep(codeOne.value + '' + codeTwo.value + '' + codeThree.value + '' + codeFour.value + '' + codeFive.value + '' + codeSix.value, token, route)
+        two_step.checkTwoStep(codeOne.value + '' + codeTwo.value + '' + codeThree.value + '' + codeFour.value + '' + codeFive.value + '' + codeSix.value, token, route);
       }
     });
 
@@ -741,7 +744,7 @@ TwoStepValidate.prototype.validatedCodeTwoStep = function (token, route) {
   });
   panel.classList.add('shown');
 
-}
+};
 
 TwoStepValidate.prototype.setTimeTwoStep = function (secondsTime) {
   secondsTime = parseInt(secondsTime);
@@ -749,11 +752,11 @@ TwoStepValidate.prototype.setTimeTwoStep = function (secondsTime) {
   var seconds = secondsTime - minutes * 60;
 
   this.time = {
-    min: minutes == 0 && seconds == 0 ? 0 : Math.abs(minutes - 5),
+    min: minutes == 0 && seconds == 0 ? 0 : Math.abs(minutes - 1),
     sec: minutes == 0 && seconds == 0 ? 0 : Math.abs(seconds - 85)
   }
   return this;
-}
+};
 
 TwoStepValidate.prototype.run = function () {
   var that = this;
@@ -768,20 +771,20 @@ TwoStepValidate.prototype.run = function () {
       }).then(function () {
         l.show().then(function () {
           post('/auth/clean', {}).then(function () {
-            window.location.href = '/';
+            usuario.cierraModal();
           })
         });
       })
     });
   } else {
-    this.timeIt();
+    this.timeIt(); // Llama al cronómetro aquí
   }
 };
 
 TwoStepValidate.prototype.timeIt = function () {
+  //aka 
   var that = this;
   var segundosTmp = 0;
-
 
   if (two_step.segundosInterval) {
     clearInterval(two_step.segundosInterval);
@@ -794,14 +797,12 @@ TwoStepValidate.prototype.timeIt = function () {
   two_step.segundosInterval = setInterval(function () {
 
     if (that.time !== null) {
-      // Reducir los segundos
       if (that.time.sec > 0) {
         that.time.sec--;
       } else if (that.time.sec === 0 && that.time.min > 0) {
         that.time.min--;
         that.time.sec = 59;
       }
-
       segundosTmp = that.time.sec < 10 ? "0" + that.time.sec : that.time.sec;
       document.getElementById('timerLabelTwoStep').textContent = "0" + that.time.min + ":" + segundosTmp;
 
@@ -809,33 +810,19 @@ TwoStepValidate.prototype.timeIt = function () {
         clearInterval(two_step.segundosInterval);
         two_step.disableAllBoxes();
 
-        console.log("Tiempo finalizado - mostrando alerta");
+        alertas.warning('Your code has expired, please request a new code');
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Your code has expired, please request a new code',
-          footer: '<span style="text-align: center">If you think that this is an error<br>Please contact MD Cloud Support</span>'
-        }).then(function () {
-
-          l.show().then(function () {
-
-            post('/recovery/clean').then(function () {
-              window.location.href = '/';
-            });
-          });
-        });
-
-        // reiniciar 
-
+        // Reiniciar la modal para el cambio de contraseña
         $('#validateTwoStep').removeClass('mostrar');
         $('#validateTwoStep').addClass('ocultar');
         $('#seccionChangePassword').removeClass('ocultar');
         $('#seccionChangePassword').addClass('mostrar');
+        // $('#profileNewPass').val('');
+        // $('#profileNewPass2').val('');
       }
     }
 
-  }, 1000);
+  }, 1000);  // Intervalo de 1 segundo
 };
 
 TwoStepValidate.prototype.disableAllBoxes = function () {
@@ -846,7 +833,17 @@ TwoStepValidate.prototype.disableAllBoxes = function () {
   document.getElementById('code4TwoStep').setAttribute('disabled', true);
   document.getElementById('code5TwoStep').setAttribute('disabled', true);
   document.getElementById('code6TwoStep').setAttribute('disabled', true);
-}
+};
+
+TwoStepValidate.prototype.enableAllBoxes = function () {
+  this.cleanAllBoxes();
+  document.getElementById('code1TwoStep').removeAttribute('disabled');
+  document.getElementById('code2TwoStep').removeAttribute('disabled');
+  document.getElementById('code3TwoStep').removeAttribute('disabled');
+  document.getElementById('code4TwoStep').removeAttribute('disabled');
+  document.getElementById('code5TwoStep').removeAttribute('disabled');
+  document.getElementById('code6TwoStep').removeAttribute('disabled');
+};
 
 TwoStepValidate.prototype.cleanAllBoxes = function () {
   document.getElementById('code1TwoStep').value = '';
@@ -856,12 +853,16 @@ TwoStepValidate.prototype.cleanAllBoxes = function () {
   document.getElementById('code5TwoStep').value = '';
   document.getElementById('code6TwoStep').value = '';
   document.getElementById('code1TwoStep').focus();
-}
+};
 
 TwoStepValidate.prototype.hideTime = function () {
   clearInterval(this.segundosInterval);
   document.getElementById('timerLabelTwoStep').style['display'] = 'none';
-}
+};
+
+TwoStepValidate.prototype.showTime = function () {
+  document.getElementById('timerLabelTwoStep').style['display'] = 'block';
+};
 
 TwoStepValidate.prototype.checkTwoStep = function (code, tokenPanel, route) {
   var data = new FormData();
@@ -877,9 +878,8 @@ TwoStepValidate.prototype.checkTwoStep = function (code, tokenPanel, route) {
     processData: false,
     data: data,
     success: function (response) {
-      console.log(response);
-      alertas.mensaje("Changes Applied");
       if (response.status === true) {
+        two_step.attempts = 0;
         two_step.cleanAllBoxes();
         two_step.disableAllBoxes();
         two_step.hideTime();
@@ -891,41 +891,30 @@ TwoStepValidate.prototype.checkTwoStep = function (code, tokenPanel, route) {
         $('#seccionChangePassword').addClass('mostrar');
         $('#seccionChangePassword').removeClass('ocultar');
         alertas.success('Two-Factor Authentication successfully validated');
+        usuario.actualizaPerfil(true);
       } else {
-        if (response.error) {
-          console.log(response.error);
-          if (response.error.description) {
-            var inv = data.error.description;
-            msg = inv.msg;
-            is_expired = parseInt(inv.expired);
-          }
-        }
+        two_step.attempts += 1;
 
-        two_step.cleanAllBoxes();
-        alertas.error('Two-Factor Authentication code is invalid. Please try again.');
-      }
+        if (two_step.attempts >= two_step.maxAttempts) {
+          two_step.cleanAllBoxes();
+          two_step.disableAllBoxes();
+          alertas.error('You have exceeded the maximum number of attempts. The code has expired. Please request a new code.');
 
-      if (data.error) {
-        if (data.error.description) {
-          var inv = data.error.description;
-          msg = inv.msg;
-          is_expired = parseInt(inv.expired);
+        } else {
+          two_step.cleanAllBoxes();
+          alertas.error('Two-Factor Authentication code is invalid. You have ' + (two_step.maxAttempts - two_step.attempts) + ' attempts remaining.');
         }
       }
-
-      return response.status;
     },
+
     error: function (request, status, error) {
       two_step.cleanAllBoxes();
-      console.log("An error occurred: " + error);
+      alertas.error('An error occurred while validating the code. Please try again.');
       return false;
     }
   });
-  usuario.infoPerfil();
-  usuario.limpiarModal();
-  valida.limpiar(camposPass);
   return true;
-}
+};
 
 TwoStepValidate.prototype.closeCode = function (route, tokenModal, camposPass) {
   two_step.cleanAllBoxes();
@@ -947,7 +936,7 @@ TwoStepValidate.prototype.closeCode = function (route, tokenModal, camposPass) {
       console.log("LLEGO ADE CODIGO");
     }
   });
-}
+};
 
 var two_step = new TwoStepValidate();
 
@@ -992,12 +981,9 @@ window.promiseSystem
     $("body").on('keyup', '.pass_PrflUser', function () {
       valida.validaPassword(this.id)
     });
-
     $("body").on('keyup', '#profileFirst, #profileLast, #profileTelfA, #profileEmail, #profileTelfB, #profileDireccion, #profileTelfC, #profileNewPass, #profileNewPass2', function () {
       $('#updateUserprofile').prop('disabled', false);
     });
-
-    // Implementacion de funcion de copiar y pegar verificacion de newpassword
 
     document.addEventListener("paste", function (e) {
       if (e.target.type === "text") {
@@ -1014,4 +1000,3 @@ window.promiseSystem
       }
     });
   });
-

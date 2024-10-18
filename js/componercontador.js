@@ -224,6 +224,7 @@ var usuario = function (ruta) {
 
       if (two_step_update_pass) {
         this.actualizaPerfilrequest(data);
+        two_step.closeCode(ruta, sistema.token, camposPass);
       } else {
         var sendCode = this.sendCodePanel(data.get('correo'), data.get('telefonoC'));
         console.log(sendCode);
@@ -438,8 +439,6 @@ var usuario = function (ruta) {
     $('#security').css('display', 'none');
     $('#usuarioContenido').css('display', 'block');
     $('#updateUserprofile').prop('disabled', true);
-
-    // two_step.closeCode(ruta, sistema.token, camposPass);
   };
 
   this.formatTelf = function () {
@@ -589,10 +588,12 @@ var usuario = function (ruta) {
   };
 
   this.sendCodePanel = function (correo, telefono) {
+    console.log('llegueeee');
     two_step.enableAllBoxes();
     two_step.showTime();
+
     if (!correo || !telefono) {
-      alert('Correo o teléfono vacío. Por favor, revisa la información.');
+      alert('Correo electrónico o teléfono vacíos. Compruebe la información');
       return;
     }
 
@@ -603,19 +604,29 @@ var usuario = function (ruta) {
     $('#validateTwoStep').removeClass('mostrar');
     $('#seccionChangePassword').addClass('ocultar');
     $('#seccionChangePassword').removeClass('mostrar');
-    var data = new FormData();
 
     $('#phoneLabel').text(telefono);
     $('#emailLabel').text(correo);
 
-    document.querySelector('button.send').addEventListener('click', function () {
-      var option = document.querySelector('input[type="radio"]:checked');
-      var typeVerification = option.value;
+    const sendButton = document.querySelector('button.send');
 
+    function handleSendClick() {
+      var option = document.querySelector('input[type="radio"]:checked');
+
+      if (!option) {
+        alert('Please select an option');
+        return;
+      }
+
+      var typeVerification = option.value;
+      var data = new FormData();
       data.append('token', sistema.token);
       data.append('options', typeVerification);
       data.append('email', correo);
       data.append('accion', 'actualizaPerfil');
+
+      if (sendButton.disabled) return;
+      sendButton.disabled = true;
 
       $.ajax({
         url: ruta + "panel_two_step",
@@ -627,13 +638,23 @@ var usuario = function (ruta) {
         success: function (response) {
           two_step.validatedCodeTwoStep(sistema.token, ruta);
         },
+        complete: function () {
+          sendButton.disabled = false;
+        },
         error: function (request, status, error) {
           console.log("An error occurred: " + error);
         }
       });
-    });
+    }
+
+    sendButton.removeEventListener('click', handleSendClick);
+
+
+    sendButton.addEventListener('click', handleSendClick);
+
     return true;
   };
+
 };
 var TwoStepValidate = function () {
   this.time = null;
@@ -752,7 +773,7 @@ TwoStepValidate.prototype.setTimeTwoStep = function (secondsTime) {
   var seconds = secondsTime - minutes * 60;
 
   this.time = {
-    min: minutes == 0 && seconds == 0 ? 0 : Math.abs(minutes - 1),
+    min: minutes == 0 && seconds == 0 ? 0 : Math.abs(minutes - 5),
     sec: minutes == 0 && seconds == 0 ? 0 : Math.abs(seconds - 85)
   }
   return this;
@@ -772,17 +793,17 @@ TwoStepValidate.prototype.run = function () {
         l.show().then(function () {
           post('/auth/clean', {}).then(function () {
             usuario.cierraModal();
+            console.log("Recargando la página...");
           })
         });
       })
     });
   } else {
-    this.timeIt(); // Llama al cronómetro aquí
+    this.timeIt();
   }
 };
 
 TwoStepValidate.prototype.timeIt = function () {
-  //aka 
   var that = this;
   var segundosTmp = 0;
 
@@ -812,17 +833,15 @@ TwoStepValidate.prototype.timeIt = function () {
 
         alertas.warning('Your code has expired, please request a new code');
 
-        // Reiniciar la modal para el cambio de contraseña
+
         $('#validateTwoStep').removeClass('mostrar');
         $('#validateTwoStep').addClass('ocultar');
         $('#seccionChangePassword').removeClass('ocultar');
         $('#seccionChangePassword').addClass('mostrar');
-        // $('#profileNewPass').val('');
-        // $('#profileNewPass2').val('');
       }
     }
 
-  }, 1000);  // Intervalo de 1 segundo
+  }, 1000);
 };
 
 TwoStepValidate.prototype.disableAllBoxes = function () {
@@ -870,6 +889,11 @@ TwoStepValidate.prototype.checkTwoStep = function (code, tokenPanel, route) {
   data.append('code', code);
   data.append('accion', 'actualizaPerfil');
 
+  const sendButton = document.querySelector('button.send');
+
+  if (sendButton.disabled) return;
+  sendButton.disabled = true;//
+
   $.ajax({
     url: route + "validate_two_step_panel",
     type: "post",
@@ -899,12 +923,16 @@ TwoStepValidate.prototype.checkTwoStep = function (code, tokenPanel, route) {
           two_step.cleanAllBoxes();
           two_step.disableAllBoxes();
           alertas.error('You have exceeded the maximum number of attempts. The code has expired. Please request a new code.');
+          usuario.cierraModal();
 
         } else {
           two_step.cleanAllBoxes();
           alertas.error('Two-Factor Authentication code is invalid. You have ' + (two_step.maxAttempts - two_step.attempts) + ' attempts remaining.');
         }
       }
+    },
+    complete: function () {
+      sendButton.disabled = false;
     },
 
     error: function (request, status, error) {
